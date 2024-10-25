@@ -1,0 +1,23 @@
+load(":rules.bzl", "copy_file", "static_file")
+load("@bazel_skylib//rules:common_settings.bzl", "string_setting")
+
+string_setting(
+    name = "dummy-setting",
+    build_setting_default = "foo",
+)
+
+static_file(
+    name = "file",
+    content = "Hello, world!",
+)
+
+copy_file(
+    name = "copied-file",
+    input = ":file",
+)
+
+copy_file(
+    name = "copied-file-with-transition",
+    dummy_setting = "bar",
+    input = ":file",
+)

@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+set -ex
+
+expect_to_equal() {
+	if [ "$1" -ne "$2" ]; then
+		echo "Expected $1 to be $2."
+		exit 1
+	fi
+}
+
+static_file_action_count="$(
+	bazel aquery 'mnemonic("^StaticFile$", //example:*)' | grep '^ *ActionKey:' | sort -u | wc -l
+)"
+
+expect_to_equal "$static_file_action_count" 2
+bazel clean
+
+static_file_action_run_count="$(
+	bazel build //example:copied-file //example:copied-file-with-transition |
+		grep -P '^Generating static file\.\.\.$' |
+		wc -l
+)"
+
+expect_to_equal "$static_file_action_run_count" 2
